@@ -1,4 +1,4 @@
-package com.gtihub.person.api.person.api.dto;
+package com.gtihub.person.api.person.api.dto.response;
 
 import lombok.Builder;
 import lombok.Data;

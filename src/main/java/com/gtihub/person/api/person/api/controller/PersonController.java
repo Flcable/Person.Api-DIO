@@ -1,33 +1,49 @@
 package com.gtihub.person.api.person.api.controller;
 
-import com.gtihub.person.api.person.api.dto.MessageResponseDTO;
-import com.gtihub.person.api.person.api.entity.Person;
-import com.gtihub.person.api.person.api.repository.PersonRepository;
+import com.gtihub.person.api.person.api.dto.request.PersonDTO;
+import com.gtihub.person.api.person.api.dto.response.MessageResponseDTO;
+import com.gtihub.person.api.person.api.exception.PersonNotFoundException;
+import com.gtihub.person.api.person.api.service.PersonService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.Entity;
-
-
-
+import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/people")
+@AllArgsConstructor(onConstructor = @__(@Autowired))
+
 public class PersonController {
 
-    private PersonRepository personRepository;
-
-    @Autowired
-    public PersonController(PersonRepository personRepository)
-    {
-        this.personRepository = personRepository;
-    }
+    private PersonService personService;
 
     @PostMapping
-    public MessageResponseDTO createPerson(@RequestBody Person person){
-        Person savedPerson = personRepository.save(person);
-        return MessageResponseDTO.builder()
-                .message("Created person with ID " + savedPerson.getId())
-                .build();
+    @ResponseStatus(HttpStatus.CREATED)
+    public MessageResponseDTO createPerson(@RequestBody @Valid PersonDTO personDTO) {
+        return personService.createPerson(personDTO);
+    }
+
+    @GetMapping
+    public List<PersonDTO> listAll() {
+        return personService.listAll();
+    }
+
+    @GetMapping("/{id}")
+    public PersonDTO findById(@PathVariable Long id) throws PersonNotFoundException {
+        return personService.findById(id);
+    }
+
+    @PutMapping("/{id}")
+    public MessageResponseDTO updateById(@PathVariable Long id, @RequestBody @Valid PersonDTO personDTO) throws PersonNotFoundException {
+        return personService.updateById(id, personDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable Long id) throws PersonNotFoundException {
+        personService.delete(id);
     }
 }
